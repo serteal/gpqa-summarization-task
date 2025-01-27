@@ -15,7 +15,7 @@ By default, we will be using gpt-4o-2024-08-06 as the language model. As hyperpa
 
 ## Summarization Mechanism
 
-In this task we compare two summarization mechanisms. The first is the extremely simple baseline of cutting the question at a certain token length. The second is a baseline summarization mechanism in the form of a prompt template that uses a call to a "summarizer" model that will generate a summary of the question. The parameterization for the summarizer comes in form of a cutoff in token length for the summary by using the `num_completion_tokens` parameter OpenAI's API. This way, we can assert that both mechanisms are using the same amount of maximum tokens for the summarization. We implement both mechanisms using custom `solver` functions [here].
+In this task we compare two summarization mechanisms. The first is the extremely simple baseline of cutting the question at a certain token length. The second is a baseline summarization mechanism in the form of a prompt template that uses a call to a "summarizer" model that will generate a summary of the question. The parameterization for the summarizer comes in form of a cutoff in token length for the summary by using the `num_completion_tokens` parameter OpenAI's API. This way, we can assert that both mechanisms are using the same amount of maximum tokens for the summarization. We implement both mechanisms using custom `solver` functions [here](https://github.com/serteal/gpqa-summarization-task/blob/e48a7def2ba53da53d4f7e879433ecc57b506006/inspect_evals/src/inspect_evals/gpqa_compressed/gpqa_compressed.py).
 
 <details>
 <summary>Summarizer prompt template</summary>
