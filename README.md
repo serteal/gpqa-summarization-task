@@ -3,7 +3,7 @@
 This task is designed to measure the performance of a language model when given a summarized version of a question from a knowledge-based reasoning task.
 
 > [!NOTE]
-> I have spent a total of 5 hours on this task. Separated in 1.5 hours of reading and understanding the assignment and implementing the baseline (during Jan 21), and ~3.5 hours of coming up with the basic summarization mechanism, setting up the experiment and writing this report (during Jan 26). Since I was time constrained, my main objective was to run the basic experiment, justify my choices and suggest future work and other possible ideas to improve the general setup and summarization mechanism.
+> I have spent a total of 7 hours on this task. Separated in 1.5 hours of reading and understanding the assignment and implementing the baseline (during Jan 21), and ~5.5 hours of coming up with the basic summarization mechanism, setting up the experiment and writing this report (during Jan 26). Since I was very time constrained, my main objective was to run the basic experiment, justify my choices and suggest future work and other possible ideas to improve the general setup and summarization mechanism.
 
 ## Setup
 
@@ -15,7 +15,7 @@ By default, we will be using gpt-4o-2024-08-06 as the language model. As hyperpa
 
 ## Summarization Mechanism
 
-In this task we compare two summarization mechanisms. The first is the extremely simple baseline of cutting the question at a certain token length. The second is a baseline summarization mechanism in the form of a prompt template that uses a call to a "summarizer" model that will generate a summary of the question. The parameterization for the summarizer comes in form of a cutoff in token length for the summary by using the `num_completion_tokens` parameter OpenAI's API. This way, we can assert that both mechanisms are using the same amount of maximum tokens for the summarization. We implement both mechanisms using custom `solver` functions [here](https://github.com/serteal/gpqa-summarization-task/blob/e48a7def2ba53da53d4f7e879433ecc57b506006/inspect_evals/src/inspect_evals/gpqa_compressed/gpqa_compressed.py).
+In this task we compare two summarization mechanisms. The first is the extremely simple baseline of cutting the question at a certain token length. The second is a baseline summarization mechanism in the form of a prompt template that uses a call to a "summarizer" model that will generate a summary of the question, we use another instance of gpt-4o-2024-08-06 as default summarizer model. The parameterization for the summarizer comes in form of a cutoff in token length for the summary by using the `num_completion_tokens` parameter OpenAI's API. This way, we can assert that both mechanisms are using the same amount of maximum tokens for the summarization. We implement both mechanisms using custom `solver` functions [here](https://github.com/serteal/gpqa-summarization-task/blob/e48a7def2ba53da53d4f7e879433ecc57b506006/inspect_evals/src/inspect_evals/gpqa_compressed/gpqa_compressed.py).
 
 <details>
 <summary>Summarizer prompt template</summary>
@@ -75,11 +75,11 @@ Next, we evaluate the summarization mechanism.
 
 For this, we have a single hyperparameter, the _compression ratio_, which we define as the ratio of the length of the summarized question to the length of the original question.
 
-We sweep over a range of compression ratios, from 0.1 to 0.9, and evaluate the performance of the language model when given a summarized version of the question using both of the summarization mechanisms described above (cutting the question at a certain token length, and using a summarizer model + `max_completion_tokens`). The results are shown in the figure below:
+We sweep over a range of compression ratios, from 0.1 to 0.9 (and also show the no-compression baseline, corresponding to a ratio of 1.0), and evaluate the performance of the language model when given a summarized version of the question using both of the summarization mechanisms described above (cutting the question at a certain token length, and using a summarizer model + `max_completion_tokens`). The results are shown in the figure below:
 
 ![GPQA Accuracy vs Compression Ratio](assets/gpqa_accuracy_vs_compression_ratio.png)
 
-As we can see, the accuracy of the language model decreases as the compression ratio increases. This is expected, as the summarization mechanism is designed to reduce the length of the question, and thus the amount of information that the language model has to process.
+As we can see, the accuracy of the language model decreases as the compression ratio increases. This is expected, as the summarization mechanism is designed to reduce the length of the question, and thus has to reduce the amount of information that is passed to the language model.
 
 ## Conclusion
 
@@ -91,10 +91,10 @@ In this task, we investigated two approaches to question summarization in the GP
 
 For future work, we recommend:
 
-- Exploring more sophisticated token allocation strategies that could help the summarizer model make better use of available tokens
+- Analyzing specific question types to identify which categories are most/least affected by the summarization mechanism
+- Exploring more sophisticated sampling/token allocation strategies that could help the summarizer model make better use of available tokens
 - Investigating hybrid approaches that combine classical text analysis with LLM-based summarization
 - Testing the approach with different model architectures to understand how summarization affects/is affected by different types of language models
-- Analyzing specific question types to identify which categories are most/least affected by summarization
 
 This initial investigation demonstrates that while question summarization inevitably leads to some performance degradation, LLM-based approaches can help preserve crucial information better than simple truncation methods.
 
@@ -116,3 +116,5 @@ inspect eval inspect_evals/gpqa_diamond_compressed --model openai/gpt-4o -T comp
 where `your_compression_ratio` is a float between 0 and 1, and `your_summarization_method` is either `llm` or `cut`.
 
 4. Export the accuracy and stderr results to a CSV file from the Inspect dashboard.
+
+5. Run `plotting.ipynb` to regenerate the plots with the new results.
